@@ -483,4 +483,5 @@ addMockMessage(chatId: string, senderUsername: string) {
     this.resetPasswordError = null;
     this.profileError = null;
   }
+
 }
