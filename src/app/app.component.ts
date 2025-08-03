@@ -434,13 +434,7 @@ chatColors: string[] = [
 
 addMockMessage(chatId: string, senderUsername: string) {
   if (chatId === this.selectedChatId) {
-    this.messages.push({
-      senderId: chatId,
-      receiverId: this.userId,
-      content: "Hi! This is a mock message.",
-      timestamp: new Date(),
-      senderUsername
-    });
+    this.selectChat(chatId);
     this.scrollToBottom();
   } else {
     const chat = this.chats.find(c => c.id === chatId);
