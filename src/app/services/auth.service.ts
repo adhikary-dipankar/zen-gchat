@@ -7,7 +7,7 @@ import { tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5025/api/auth';
+  private apiUrl = 'https://zenzoneapi.onrender.com/api/Auth';
 
   constructor(private http: HttpClient) {}
 
