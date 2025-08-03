@@ -4,6 +4,8 @@ import { ChatService } from './services/chat.service';
 import { trigger, transition, style, animate } from '@angular/animations';
 import * as anime from 'animejs';
 import { interval, Subscription } from 'rxjs';
+import { ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+
 
 @Component({
   selector: 'app-root',
@@ -80,7 +82,11 @@ import { interval, Subscription } from 'rxjs';
     ])
   ]
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef;
+    ngAfterViewInit() {
+    this.scrollToBottom();
+  }
   isAuthenticated: boolean = false;
   isLogin: boolean = true;
   showForgotPassword: boolean = false;
@@ -158,6 +164,15 @@ chatColors: string[] = [
       this.notificationSubscription.unsubscribe();
     }
   }
+   scrollToBottom(): void {
+    try {
+      setTimeout(() => {
+        this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
+      }, 100); // delay to ensure DOM is updated
+    } catch (err) {
+      console.warn('Auto-scroll error:', err);
+    }
+  }
 
   loadUsers() {
     this.authService.getUsers().subscribe({
@@ -226,6 +241,7 @@ chatColors: string[] = [
           ...msg,
           senderUsername: this.getUsernameById(msg.senderId)
         }));
+        this.scrollToBottom();
         const chat = this.chats.find(c => c.id === id);
         if (chat) {
           chat.unreadMessages = 0; // Clear unread messages
@@ -287,6 +303,24 @@ chatColors: string[] = [
       next: () => {
         this.isLogin = true;
         this.signupError = null;
+        this.clearErrors();
+        this.loginModel.email = this.signupModel.email;
+        this.loginModel.password = this.signupModel.password;
+        this.authService.login(this.loginModel).subscribe({
+        next: () => {
+          this.isAuthenticated = true;
+          this.userId = this.authService.getUserId();
+          this.profileModel.username = this.authService.getUsername() ?? '';
+          this.profileModel.bio = this.authService.getBio() ?? '';
+          this.loadUsers();
+          this.loadChats();
+        },
+        error: (err) => {
+          this.loginError = err.error || 'Login failed. Please try again.';
+          console.error('Login error:', err);
+        }
+        });
+
       },
       error: (err) => {
         this.signupError = err.error || 'Signup failed. Please try again.';
@@ -389,22 +423,33 @@ chatColors: string[] = [
           });
           this.updateChatLastMessage(this.selectedChatId, this.newMessage);
           this.newMessage = '';
+          this.scrollToBottom();
         },
         error: (err) => console.error('Send message error:', err)
       });
     }
   }
 
-  addMockMessage(chatId: string, senderUsername: string) {
-    if (chatId !== this.selectedChatId) {
-      const chat = this.chats.find(c => c.id === chatId);
-      if (chat) {
-        chat.unreadMessages = (chat.unreadMessages || 0) + 1;
-        this.notificationMessage = `New message from ${senderUsername}`;
-        setTimeout(() => this.clearNotification(), 3000);
-      }
+addMockMessage(chatId: string, senderUsername: string) {
+  if (chatId === this.selectedChatId) {
+    this.messages.push({
+      senderId: chatId,
+      receiverId: this.userId,
+      content: "Hi! This is a mock message.",
+      timestamp: new Date(),
+      senderUsername
+    });
+    this.scrollToBottom();
+  } else {
+    const chat = this.chats.find(c => c.id === chatId);
+    if (chat) {
+      chat.unreadMessages = (chat.unreadMessages || 0) + 1;
+      this.notificationMessage = `New message from ${senderUsername}`;
+      setTimeout(() => this.clearNotification(), 3000);
     }
   }
+}
+
 
   clearNotification() {
     this.notificationMessage = null;

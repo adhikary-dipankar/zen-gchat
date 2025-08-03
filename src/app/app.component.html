@@ -267,7 +267,7 @@
     </ng-template>
     <div class="input-group">
       <input type="text" class="form-control" [(ngModel)]="newMessage" name="message" placeholder="Type a message..." required>
-      <button type="button" (click)="sendMessage()" class="btn btn-primary">Send</button>
+      <button type="button" (keydown.enter)="sendMessage()" class="btn btn-primary">Send</button>
     </div>
   </div>
 </div>
