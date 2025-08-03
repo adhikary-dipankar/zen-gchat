@@ -253,7 +253,7 @@
 
   <!-- Chat Messages -->
   <div class="w-full md:w-3/4 bg-white shadow-lg rounded-xl p-4 flex flex-col" style="max-height: 600px;">
-    <div *ngIf="selectedChatId; else noChatSelected" class="flex-1 overflow-y-auto mb-4">
+    <div *ngIf="selectedChatId; else noChatSelected" class="flex-1 overflow-y-auto mb-4" #scrollContainer>
       <div *ngFor="let message of messages" class="mb-2" [ngClass]="message.senderId === userId ? 'text-right' : 'text-left'" @messageFade>
         <div class="inline-block p-3 rounded-2xl max-w-sm break-words" [ngClass]="message.senderId === userId ? 'bg-zen-blue text-white rounded-br-none' : 'bg-green-200 text-gray-800 rounded-bl-none'">
           <p class="text-[16px] font-semibold leading-none mb-1">{{ message.senderUsername }}</p>
@@ -265,10 +265,25 @@
     <ng-template #noChatSelected>
       <p class="text-center text-gray-500 flex-1 flex items-center justify-center">Select a chat to start messaging.</p>
     </ng-template>
-    <div class="input-group">
-      <input type="text" class="form-control" [(ngModel)]="newMessage" name="message" placeholder="Type a message..." required>
-      <button type="button" (keydown.enter)="sendMessage()" class="btn btn-primary">Send</button>
-    </div>
+<div class="input-group">
+  <input
+    type="text"
+    class="form-control"
+    [(ngModel)]="newMessage"
+    name="message"
+    placeholder="Type a message..."
+    required
+    (keydown.enter)="sendMessage()"
+  />
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="sendMessage()"
+  >
+    Send
+  </button>
+</div>
+
   </div>
 </div>
 
