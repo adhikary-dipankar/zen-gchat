@@ -125,6 +125,8 @@ chatColors: string[] = [
   resetPasswordError: string | null = null;
   profileError: string | null = null;
   notificationMessage: string | null = null;
+  showPassword: boolean = false;
+
   private notificationSubscription: Subscription | null = null;
 
   constructor(private authService: AuthService, private chatService: ChatService) {}
